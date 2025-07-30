@@ -80,11 +80,18 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.autoops.secretName }}
                   key: {{ .Values.autoops.secrets.esApiKey }}
-            - name: CLOUD_CONNECTED_MODE_API_KEY
+            {{- end }}
+            - name: ELASTIC_CLOUD_CONNECTED_MODE_API_KEY
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.autoops.secretName }}
                   key: {{ .Values.autoops.secrets.cloudConnectedModeApiKey }}
+            {{- if .Values.autoops.secrets.cloudConnectedModeApiUrl }}
+            - name: ELASTIC_CLOUD_CONNECTED_MODE_API_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.autoops.secretName }}
+                  key: {{ .Values.autoops.secrets.cloudConnectedModeApiUrl }}
             {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
