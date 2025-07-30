@@ -43,11 +43,6 @@ spec:
                 secretKeyRef:
                   name: autoops-secret
                   key: autoops-es-url
-            - name: RESOURCE_ID
-              valueFrom:
-                secretKeyRef:
-                  name: autoops-secret
-                  key: resource-id
             - name: AUTOOPS_TEMP_RESOURCE_ID
               valueFrom:
                 secretKeyRef:
