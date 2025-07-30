@@ -1,0 +1,98 @@
+# Default values for autoops-agent
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: docker.elastic.co/elastic-agent/elastic-otel-collector-wolfi
+  pullPolicy: Always
+  tag: "9.1.0-SNAPSHOT"
+
+imagePullSecrets: []
+
+nameOverride: ""
+fullnameOverride: ""
+
+# AutoOps Configuration
+autoops:
+  # Secret name containing AutoOps configuration
+  secretName: autoops-secret
+  
+  # Configuration file path
+  configPath: otel_samples/autoops_es.yml
+  
+  # Authentication mode: "userpass" or "apikey"
+  authMode: userpass
+  
+  # Environment variables configuration keys in the secret
+  secrets:
+    token: autoops-token
+    esUrl: autoops-es-url
+    tempResourceId: temp-resource-id
+    otelUrl: autoops-otel-url
+    # User/Password authentication keys
+    esUsername: es-username
+    esPassword: es-password
+    # API Key authentication keys
+    esApiKey: es-api-key
+    cloudConnectedModeApiKey: cloud-connected-mode-api-key
+
+# Pod Security Context
+podSecurityContext: {}
+
+# Container Security Context
+securityContext: {}
+
+# Resource limits and requests
+resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+# Node selection
+nodeSelector: {}
+
+# Tolerations
+tolerations: []
+
+# Affinity rules
+affinity: {}
+
+# Pod annotations
+podAnnotations: {}
+
+# Pod labels
+podLabels:
+  app.kubernetes.io/component: autoops
+
+# Deployment strategy
+strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxSurge: 25%
+    maxUnavailable: 25%
+
+# Progress deadline seconds
+progressDeadlineSeconds: 600
+
+# Revision history limit
+revisionHistoryLimit: 10
+
+# Termination grace period
+terminationGracePeriodSeconds: 30
+
+# DNS Policy
+dnsPolicy: ClusterFirst
+
+# Restart policy
+restartPolicy: Always
+
+# Container configuration
+container:
+  name: autoops-elastic-agent
+  terminationMessagePath: /dev/termination-log
+  terminationMessagePolicy: File

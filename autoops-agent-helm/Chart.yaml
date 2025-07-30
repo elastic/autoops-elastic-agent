@@ -1,0 +1,17 @@
+apiVersion: v2
+name: autoops-agent
+description: A Helm chart for AutoOps Elastic Agent deployment
+type: application
+version: 0.1.0
+appVersion: "9.1.0-SNAPSHOT"
+keywords:
+  - autoops
+  - elastic
+  - agent
+  - otel
+  - monitoring
+home: https://github.com/elastic/autoops-elastic-agent
+sources:
+  - https://github.com/elastic/autoops-elastic-agent
+maintainers:
+  - name: Elastic Team

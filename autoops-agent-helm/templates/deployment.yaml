@@ -1,0 +1,116 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "autoops-agent.fullname" . }}
+  labels:
+    {{- include "autoops-agent.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  progressDeadlineSeconds: {{ .Values.progressDeadlineSeconds }}
+  revisionHistoryLimit: {{ .Values.revisionHistoryLimit }}
+  selector:
+    matchLabels:
+      {{- include "autoops-agent.selectorLabels" . | nindent 6 }}
+  strategy:
+    {{- toYaml .Values.strategy | nindent 4 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "autoops-agent.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Values.container.name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            - "--config"
+            - {{ .Values.autoops.configPath }}
+          env:
+            - name: AUTOOPS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.autoops.secretName }}
+                  key: {{ .Values.autoops.secrets.token }}
+            - name: AUTOOPS_ES_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.autoops.secretName }}
+                  key: {{ .Values.autoops.secrets.esUrl }}
+            - name: AUTOOPS_TEMP_RESOURCE_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.autoops.secretName }}
+                  key: {{ .Values.autoops.secrets.tempResourceId }}
+            - name: AUTOOPS_OTEL_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.autoops.secretName }}
+                  key: {{ .Values.autoops.secrets.otelUrl }}
+            {{- if eq .Values.autoops.authMode "userpass" }}
+            - name: ELASTICSEARCH_READ_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.autoops.secretName }}
+                  key: {{ .Values.autoops.secrets.esUsername }}
+            - name: ELASTICSEARCH_READ_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.autoops.secretName }}
+                  key: {{ .Values.autoops.secrets.esPassword }}
+            {{- else if eq .Values.autoops.authMode "apikey" }}
+            - name: ELASTICSEARCH_READ_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.autoops.secretName }}
+                  key: {{ .Values.autoops.secrets.esApiKey }}
+            - name: CLOUD_CONNECTED_MODE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.autoops.secretName }}
+                  key: {{ .Values.autoops.secrets.cloudConnectedModeApiKey }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          terminationMessagePath: {{ .Values.container.terminationMessagePath }}
+          terminationMessagePolicy: {{ .Values.container.terminationMessagePolicy }}
+          {{- with .Values.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      dnsPolicy: {{ .Values.dnsPolicy }}
+      restartPolicy: {{ .Values.restartPolicy }}
+      schedulerName: {{ .Values.schedulerName }}
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}

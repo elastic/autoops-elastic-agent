@@ -1,0 +1,44 @@
+1. Get the application URL by running these commands:
+{{- if contains "NodePort" .Values.service.type }}
+  export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "autoops-agent.fullname" . }})
+  export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+  echo http://$NODE_IP:$NODE_PORT
+{{- else if contains "LoadBalancer" .Values.service.type }}
+     NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+           You can watch the status of by running 'kubectl get --namespace {{ .Release.Namespace }} svc -w {{ include "autoops-agent.fullname" . }}'
+  export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "autoops-agent.fullname" . }} --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
+  echo http://$SERVICE_IP:{{ .Values.service.port }}
+{{- else if contains "ClusterIP" .Values.service.type }}
+  export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "autoops-agent.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
+  export CONTAINER_PORT=$(kubectl get pod --namespace {{ .Release.Namespace }} $POD_NAME -o jsonpath="{.spec.containers[0].ports[0].containerPort}")
+  echo "Visit http://127.0.0.1:8080 to use your application"
+  kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 8080:$CONTAINER_PORT
+{{- end }}
+
+2. AutoOps Agent has been deployed successfully!
+   
+   To check the status of your deployment:
+   kubectl get pods -l app.kubernetes.io/name={{ include "autoops-agent.name" . }}
+   
+   To view logs:
+   kubectl logs -l app.kubernetes.io/name={{ include "autoops-agent.name" . }} -f
+   
+   Make sure your AutoOps secret is properly configured with the required keys:
+   - {{ .Values.autoops.secrets.token }}
+   - {{ .Values.autoops.secrets.esUrl }}
+   - {{ .Values.autoops.secrets.tempResourceId }}
+   - {{ .Values.autoops.secrets.otelUrl }}
+   
+   {{- if eq .Values.autoops.authMode "userpass" }}
+   Authentication Mode: User/Password
+   Additional required secret keys:
+   - {{ .Values.autoops.secrets.esUsername }}
+   - {{ .Values.autoops.secrets.esPassword }}
+   {{- else if eq .Values.autoops.authMode "apikey" }}
+   Authentication Mode: API Key
+   Additional required secret keys:
+   - {{ .Values.autoops.secrets.esApiKey }}
+   - {{ .Values.autoops.secrets.cloudConnectedModeApiKey }}
+   {{- end }}
+   
+   To switch authentication modes, update the autoops.authMode value to either "userpass" or "apikey".
