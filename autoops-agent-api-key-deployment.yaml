@@ -59,11 +59,11 @@ spec:
                 secretKeyRef:
                   name: autoops-secret
                   key: es-api-key
-            - name: CLOUD_CONNECTED_MODE_API_KEY
+            - name: ELASTIC_CLOUD_CONNECTED_MODE_API_KEY
               valueFrom:
                 secretKeyRef:
                   name: autoops-secret
-                  key: cloud-connected-mode-api-key
+                  key: elastic-cloud-connected-mode-api-key
           image: >-
             docker.elastic.co/elastic-agent/elastic-otel-collector-wolfi:9.1.0-SNAPSHOT
           imagePullPolicy: Always
