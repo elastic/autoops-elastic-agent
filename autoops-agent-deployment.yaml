@@ -74,6 +74,7 @@ spec:
                 secretKeyRef:
                   name: autoops-secret
                   key: cloud-connected-mode-api-url
+                  optional: true
           image: >-
             docker.elastic.co/elastic-agent/elastic-otel-collector-wolfi:9.1.0-SNAPSHOT
           imagePullPolicy: Always
