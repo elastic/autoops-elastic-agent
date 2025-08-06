@@ -63,7 +63,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: autoops-secret
-                  key: elastic-cloud-connected-mode-api-key
+                  key: es-api-key
             - name: ELASTIC_CLOUD_CONNECTED_MODE_API_URL
               valueFrom:
                 secretKeyRef:
