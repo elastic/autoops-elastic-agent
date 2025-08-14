@@ -36,7 +36,9 @@ autoops:
     esPassword: es-password
     # API Key authentication keys
     esApiKey: es-api-key
+    # Elastic Cloud API Key for CCM
     cloudConnectedModeApiKey: cloud-connected-mode-api-key
+    cloudConnectedModeApiUrl: cloud-connected-mode-api-url
 
 # Pod Security Context
 podSecurityContext: {}
