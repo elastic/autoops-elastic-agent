@@ -76,7 +76,7 @@ spec:
                   key: cloud-connected-mode-api-url
                   optional: true
           image: >-
-            docker.elastic.co/elastic-agent/elastic-otel-collector-wolfi:9.1.0-SNAPSHOT
+            docker.elastic.co/elastic-agent/elastic-otel-collector-wolfi:9.1.0
           imagePullPolicy: Always
           name: autoops-elastic-agent
           resources: {}
